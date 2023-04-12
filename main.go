@@ -34,6 +34,7 @@ func main() {
 
 // createHandler cria uma nova URL encurtada a partir de uma URL original.
 func createHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	queryParams := r.URL.Query()
 	url := queryParams.Get("url")
 	customAlias := queryParams.Get("CUSTOM_ALIAS")
@@ -77,6 +78,9 @@ func retrieveHandler(w http.ResponseWriter, r *http.Request) {
 func toJSONError(err error) string {
 	jsonErr, _ := json.Marshal(struct{ Error string }{Error: err.Error()})
 	return string(jsonErr)
+}
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func corsMiddleware(next http.Handler) http.Handler {
