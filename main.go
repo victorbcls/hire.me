@@ -22,6 +22,7 @@ func main() {
 	_client = client
 
 	router := mux.NewRouter()
+	router.Use(corsMiddleware)
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
 	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
 
@@ -76,4 +77,18 @@ func retrieveHandler(w http.ResponseWriter, r *http.Request) {
 func toJSONError(err error) string {
 	jsonErr, _ := json.Marshal(struct{ Error string }{Error: err.Error()})
 	return string(jsonErr)
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
