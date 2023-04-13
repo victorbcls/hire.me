@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -22,7 +23,7 @@ func main() {
 	_client = client
 
 	router := mux.NewRouter()
-
+	router.HandleFunc("/", home)
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
 	router.HandleFunc("/r/{alias}", retrieveHandler).Methods(http.MethodGet)
 	router.HandleFunc("/top10", acessosHandler).Methods(http.MethodGet)
@@ -82,6 +83,13 @@ func acessosHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseJson)
 
+}
+func home(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("index.html"))
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // toJSONError converte um erro em uma string JSON no formato {"error": "mensagem de erro"}.
