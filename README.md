@@ -98,3 +98,6 @@ GET http://localhost:8080/mais_acessadas
 
 ## Diagrama
 ![alt text](https://github.com/victorbcls/hire.me/blob/master/readme_assets/diagrama.png)
+
+### Bonus
+A Api está rodando em um container em uma instância aws e pode ser acessada e testada pelo endereço ```http://192.168.1.105:8080/```
