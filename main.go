@@ -25,7 +25,7 @@ func main() {
 
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
 	router.HandleFunc("/r/{alias}", retrieveHandler).Methods(http.MethodGet)
-	router.HandleFunc("/mais_acessados", acessosHandler).Methods(http.MethodGet)
+	router.HandleFunc("/top10", acessosHandler).Methods(http.MethodGet)
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		log.Fatalf("Erro ao iniciar o servidor HTTP: %v", err)
