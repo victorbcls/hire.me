@@ -32,7 +32,7 @@ func main() {
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
 	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
 
-	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(c)(router)))
+	err = http.ListenAndServe(":8080", handlers.CORS(c)(router))
 
 	if err != nil {
 		log.Fatalf("Erro ao iniciar o servidor HTTP: %v", err)
