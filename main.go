@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/victorbcls/hire.me/controllers/db"
 	"github.com/victorbcls/hire.me/controllers/shorter"
@@ -26,7 +27,13 @@ func main() {
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
 	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
 
-	err = http.ListenAndServe(":8080", router)
+	c := handlers.AllowedOrigins([]string{"*"})
+
+	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
+	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
+
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(c)(router)))
+
 	if err != nil {
 		log.Fatalf("Erro ao iniciar o servidor HTTP: %v", err)
 	}
@@ -34,8 +41,6 @@ func main() {
 
 // createHandler cria uma nova URL encurtada a partir de uma URL original.
 func createHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	queryParams := r.URL.Query()
 	url := queryParams.Get("url")
 	customAlias := queryParams.Get("CUSTOM_ALIAS")
