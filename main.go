@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/victorbcls/hire.me/controllers/db"
 	"github.com/victorbcls/hire.me/controllers/shorter"
@@ -25,15 +24,9 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
-	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
-
-	c := handlers.AllowedOrigins([]string{"*"})
-
-	router.HandleFunc("/create", createHandler).Methods(http.MethodPut)
-	router.HandleFunc("/{alias}", retrieveHandler).Methods(http.MethodGet)
-
-	err = http.ListenAndServe(":8080", handlers.CORS(c)(router))
-
+	router.HandleFunc("/r/{alias}", retrieveHandler).Methods(http.MethodGet)
+	router.HandleFunc("/mais_acessados", acessosHandler).Methods(http.MethodGet)
+	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		log.Fatalf("Erro ao iniciar o servidor HTTP: %v", err)
 	}
@@ -77,6 +70,17 @@ func retrieveHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(responseJson)
 	}
+
+}
+
+func acessosHandler(w http.ResponseWriter, r *http.Request) {
+	responseJson, err := shorter.TopAccess(_client)
+	if err != nil {
+		http.Error(w, toJSONError(err), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseJson)
 
 }
 

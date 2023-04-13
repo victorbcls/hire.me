@@ -11,12 +11,14 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Struct para registrar as informações de URL e alias
 type Register struct {
-	Alias string `json:"alias"`
-	URL   string `json:"url"`
+	Alias   string `json:"alias"`
+	URL     string `json:"url"`
+	Acessos int    `json:"acessos"`
 }
 
 // Struct para registrar o tempo gasto na rotina
@@ -89,8 +91,9 @@ func GenerateShortURL(url, customAlias string, client *mongo.Client) ([]byte, er
 
 	// Registra a URL e o alias no banco de dados
 	register := Register{
-		Alias: alias,
-		URL:   url,
+		Alias:   alias,
+		URL:     url,
+		Acessos: 0,
 	}
 
 	if err := saveRegister(register, client); err != nil {
@@ -151,10 +154,50 @@ func RetrieveUrl(shortURL string, client *mongo.Client) ([]byte, error) {
 		return json.Marshal(errResp)
 	}
 
+	// Atualiza o valor de acessos e salva a alteração no banco de dados
+	result.Acessos++
+	update := bson.M{"$set": bson.M{"acessos": result.Acessos}}
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		errResp := ErrorResponse{
+			Alias:       shortURL,
+			ErrCode:     "002",
+			Description: "FAILED TO UPDATE SHORTENED URL IN DATABASE",
+		}
+		return json.Marshal(errResp)
+	}
+
 	return json.Marshal(result)
 }
-
 func isValidURL(urlStr string) bool {
 	u, err := url.Parse(urlStr)
 	return err == nil && u.Scheme != "" && u.Host != ""
+}
+func TopAccess(client *mongo.Client) ([]byte, error) {
+	// Busca os registros no banco de dados, ordenando por acessos em ordem decrescente e limitando a 10
+	collection := client.Database("mydb").Collection("shorter")
+	options := options.Find().SetSort(bson.M{"acessos": -1}).SetLimit(10)
+	cursor, err := collection.Find(context.Background(), bson.M{}, options)
+	if err != nil {
+		errResp := ErrorResponse{
+			Alias:       "",
+			ErrCode:     "004",
+			Description: "DATABASE ERROR: FAILED TO RETRIEVE TOP 10 REGISTERS FROM DATABASE",
+		}
+		return json.Marshal(errResp)
+	}
+	defer cursor.Close(context.Background())
+
+	// Cria um slice com os resultados da busca
+	var results []Register
+	if err = cursor.All(context.Background(), &results); err != nil {
+		errResp := ErrorResponse{
+			Alias:       "",
+			ErrCode:     "004",
+			Description: "DATABASE ERROR: FAILED TO RETRIEVE TOP 10 REGISTERS FROM DATABASE",
+		}
+		return json.Marshal(errResp)
+	}
+
+	return json.Marshal(results)
 }
