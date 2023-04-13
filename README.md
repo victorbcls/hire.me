@@ -2,6 +2,7 @@
 
 O projeto é um serviço que permite encurtar URLs, tornando-as mais fáceis de serem compartilhadas e lembradas.
 
+
 ## Utilização
 
 Para utilizar o projeto, é necessário ter o Go instalado em sua máquina. Em seguida, execute o seguinte comando:
@@ -68,14 +69,14 @@ Caso a URL esteja registrada no banco, automaticamente será redirecionado ao si
 }
 ```
 
-### /mais_acessadas
+### /top10
 
-O endpoint /mais_acessadas é utilizado para vizualizar as 10 Urls mais acessadas
+O endpoint /top10 é utilizado para vizualizar as 10 Urls mais acessadas
 
 ### Exemplo
 
 ```bash
-GET http://localhost:8080/mais_acessadas
+GET http://localhost:8080/top10
 
 ```
 
@@ -95,3 +96,17 @@ GET http://localhost:8080/mais_acessadas
   { "alias": "Netflix", "url": "https://www.netflix.com", "acessos": 50 }
 ]
 ```
+
+## Diagrama
+![alt text](https://github.com/victorbcls/hire.me/blob/master/readme_assets/diagrama.png)
+
+## Stack
+O projeto utiliza Go como linguagem e MongoDB como banco de dados (Utilizando o MongoAtlas para permitir o acesso também pela instância)
+Escolhi essa linguagem por se tratar de um processo simples em que a velocidade de resposta interfere muito na experiência do usuário. O Banco de dados utilizado foi o MongoDb pois se tratando de um processo que um registro não se correlaciona com nenhum outro, um banco não relacional traz a simplicidade que é preciso para todo o processo funcionar perfeitamente.
+
+
+### Bonus
+A Api está rodando em um container em uma instância aws e pode ser acessada e testada pelo endereço ```http://18.228.23.143:8080/```
+
+### Sugestão
+Gostaria de ter implementado também um sistema de "limpa" de encurtadores (dos que foram gerados aleatoriamente) após uma quantidade de tempo sem acesso, diminuindo assim a ocorrencia de Urls que são usadas apenas uma vez ocupando espaço no Banco de Dados
