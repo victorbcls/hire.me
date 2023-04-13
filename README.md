@@ -69,14 +69,14 @@ Caso a URL esteja registrada no banco, automaticamente será redirecionado ao si
 }
 ```
 
-### /mais_acessadas
+### /top10
 
-O endpoint /mais_acessadas é utilizado para vizualizar as 10 Urls mais acessadas
+O endpoint /top10 é utilizado para vizualizar as 10 Urls mais acessadas
 
 ### Exemplo
 
 ```bash
-GET http://localhost:8080/mais_acessadas
+GET http://localhost:8080/top10
 
 ```
 
