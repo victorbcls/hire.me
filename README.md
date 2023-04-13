@@ -95,3 +95,6 @@ GET http://localhost:8080/mais_acessadas
   { "alias": "Netflix", "url": "https://www.netflix.com", "acessos": 50 }
 ]
 ```
+
+## Diagrama
+![alt text]([path/to/file](https://github.com/victorbcls/hire.me/blob/master/readme_assets/diagrama.png))
